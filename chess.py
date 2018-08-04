@@ -341,19 +341,35 @@ def SetBoard():
             Board[i][j].SetY(i*Board[i][j].GetHeight())
             Count = (Count + 1) % 8
             
-def SetStartingPieces():
-    white = [[Rook("White"),Knight("White"),Bishop("White"),King("White"),Queen("White"),Bishop("White"),Knight("White"),Rook("White")],
-             [Pawn("White"),Pawn("White"),Pawn("White"),Pawn("White"),Pawn("White"),Pawn("White"),Pawn("White"),Pawn("White")],
-             ]
-    black = [[Pawn("Black"),Pawn("Black"),Pawn("Black"),Pawn("Black"),Pawn("Black"),Pawn("Black"),Pawn("Black"),Pawn("Black")],
-             [Rook("Black"),Knight("Black"),Bishop("Black"),King("Black"),Queen("Black"),Bishop("Black"),Knight("Black"),Rook("Black")],
-             ]
-    for i in range(2):
-        for j in range(8):
-            Board[i][j].SetContainedPiece(white[i][j])
-    for i in range(6,8):
-        for j in range(8):
-            Board[i][j].SetContainedPiece(black[i-6][j])
+def SetPieces(filename):
+    LoadBoard = []
+    file = open(filename,'r')
+    for row in file.readlines():
+        LoadBoard.append(row.strip().split(','))
+    for i in range(8):
+        for k in range(8):
+            if LoadBoard[i][k] != 'XX':
+                Piece = LoadBoard[i][k]
+                Color = GetColor(Piece[1])
+                if Piece[0] == "P":
+                    Board[i][k].SetContainedPiece(Pawn(Color))
+                elif Piece[0] == "R":
+                    Board[i][k].SetContainedPiece(Rook(Color))
+                elif Piece[0] == "N":
+                    Board[i][k].SetContainedPiece(Knight(Color))
+                elif Piece[0] == "B":
+                    Board[i][k].SetContainedPiece(Bishop(Color))
+                elif Piece[0] == "K":
+                    Board[i][k].SetContainedPiece(King(Color))
+                elif Piece[0] == "Q":
+                    Board[i][k].SetContainedPiece(Queen(Color))
+
+def GetColor(Color):
+    if Color == "W":
+        return "White"
+    else:
+        return "Black"
+
 def ShowBoard():
     for i in range(8):
         for j in range(8):
@@ -535,7 +551,7 @@ def Main():
     GameOver = False
     app.begin()
     SetBoard()
-    SetStartingPieces()
+    SetPieces('default.txt')
     while not GameOver:
         Render()
         if Game.GetTurn() == "White":
@@ -556,17 +572,3 @@ if __name__ == "__main__":
     PlayerOne = PlayerClass("White")
     PlayerTwo = PlayerClass("Black")
     Main()
-        
-
-            
-
-
-
-
-
-
-
-
-
-
-        
