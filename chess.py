@@ -1,5 +1,6 @@
 import pygame_setup as pg
-import pygame, os, time
+import pygame, os, time, tkinter
+import tkinter.messagebox
 
 WHITE = (255,255,255)
 BLACK = (0,0,0)
@@ -62,13 +63,16 @@ class Piece():
         return self.Color
         
 class Pawn(Piece):
-    def __init__(self,color):
+    def __init__(self,color,moved=False):
         self.Name = "Pawn"
-        self.HasBeenMoved = False
+        self.HasBeenMoved = moved
         Piece.__init__(self,color)
 
     def SetHasBeenMoved(self):
         self.HasBeenMoved = True
+
+    def GetHasBeenMoved(self):
+        return self.HasBeenMoved
     
     def GetDestinations(self,PlayerTurn,CurrentCell):
         x,y = GetIndexFromCell(CurrentCell)
@@ -202,13 +206,16 @@ class Bishop(Piece):
         return ValidMoves
 
 class King(Piece):
-    def __init__(self,color):
+    def __init__(self,color,moved=False):
         self.Name = "King"
-        self.HasBeenMoved = False
+        self.HasBeenMoved = moved
         Piece.__init__(self,color)
 
     def SetHasBeenMoved(self):
         self.HasBeenMoved = True
+
+    def GetHasBeenMoved(self):
+        return self.HasBeenMoved
 
     def GetDestinations(self,PlayerTurn,CurrentCell):
         ValidMoves = []
@@ -343,9 +350,10 @@ def SetBoard():
             
 def SetPieces(filename):
     LoadBoard = []
-    file = open(filename,'r')
-    for row in file.readlines():
-        LoadBoard.append(row.strip().split(','))
+    File = open(filename,'r')
+    for Row in File.readlines():
+        LoadBoard.append(Row.strip().split(','))
+    File.close()
     for i in range(8):
         for k in range(8):
             if LoadBoard[i][k] != 'XX':
@@ -353,6 +361,8 @@ def SetPieces(filename):
                 Color = GetColor(Piece[1])
                 if Piece[0] == "P":
                     Board[i][k].SetContainedPiece(Pawn(Color))
+                elif Piece[0] == "p":
+                    Board[i][k].SetContainedPiece(Pawn(Color,True))
                 elif Piece[0] == "R":
                     Board[i][k].SetContainedPiece(Rook(Color))
                 elif Piece[0] == "N":
@@ -361,6 +371,8 @@ def SetPieces(filename):
                     Board[i][k].SetContainedPiece(Bishop(Color))
                 elif Piece[0] == "K":
                     Board[i][k].SetContainedPiece(King(Color))
+                elif Piece[0] == "k":
+                    Board[i][k].SetContainedPiece(King(Color,True))
                 elif Piece[0] == "Q":
                     Board[i][k].SetContainedPiece(Queen(Color))
 
@@ -369,6 +381,36 @@ def GetColor(Color):
         return "White"
     else:
         return "Black"
+
+def AskSave():
+    root = tkinter.Tk()
+    root.withdraw()
+    response = tkinter.messagebox.askyesno("Warning","Would you like to save your game?")
+    root.update()
+    return response
+
+def SaveGame():
+    print("saving game...")
+    SaveBoard = []
+    for i in range(8):
+        Row = []
+        for j in range(8):
+            try:
+                ChessPiece = Board[i][j].GetContainedPiece().GetName()
+                PieceColor = Board[i][j].GetContainedPiece().GetColor()
+                if ChessPiece == "King" or ChessPiece == "Pawn":
+                    if Board[i][j].GetContainedPiece().GetHasBeenMoved() == True:
+                        ChessPiece = ChessPiece.lower()
+            except:
+                ChessPiece, PieceColor = "X", "X"
+            finally:
+                Row.append(ChessPiece[0] + PieceColor[0])
+        SaveBoard.append(Row)
+    File = open("save_game.txt","w")
+    for Row in SaveBoard:
+        File.write("".join(Row)+"\n")
+    File.close()
+
 
 def ShowBoard():
     for i in range(8):
@@ -435,6 +477,9 @@ def SelectPiece():
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                SaveGameResponse = AskSave()
+                if SaveGameResponse == True:
+                    SaveGame()
                 app.exit()
         
             elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -450,6 +495,9 @@ def SelectDest():
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                SaveGameResponse = AskSave()
+                if SaveGameResponse == True:
+                    SaveGame()
                 app.exit()
         
             elif event.type == pygame.MOUSEBUTTONDOWN:
