@@ -469,7 +469,7 @@ def Turn(Player):
             if Piece.GetName() == "King":
                 SY, SX = GetIndexFromCell(PieceCell)
                 DY, DX = GetIndexFromCell(DestCell)
-                if abs(SX-DX) != 1:
+                if abs(SX-DX) != 1 and SY-DY == 0:
                     CastleSwap(PieceCell,DestCell)
                 else:
                     Move(PieceCell,DestCell)
