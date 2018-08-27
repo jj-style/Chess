@@ -311,7 +311,7 @@ class PlayerClass():
             for j in range(8):
                 Piece = Board[i][j].GetContainedPiece()
                 if Piece != None:
-                    if Piece.GetColor() != self.PlayerColor and Piece.GetName() != "King":
+                    if Piece.GetColor() != self.PlayerColor:# and Piece.GetName() != "King":
                         Destinations = Piece.GetDestinations(OtherPlayerColor,Board[i][j])
                         for Dest in Destinations:
                             if Dest.GetContainedPiece() != None:
