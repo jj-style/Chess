@@ -375,6 +375,8 @@ def SetPieces(filename):
                     Board[i][k].SetContainedPiece(King(Color,True))
                 elif Piece[0] == "Q":
                     Board[i][k].SetContainedPiece(Queen(Color))
+    if LoadBoard[-1][0] == "Black":
+        Game.SwitchTurn()
 
 def GetColor(Color):
     if Color == "W":
@@ -405,10 +407,11 @@ def SaveGame():
                 ChessPiece, PieceColor = "X", "X"
             finally:
                 Row.append(ChessPiece[0] + PieceColor[0])
-        SaveBoard.append(Row)
+        SaveBoard.append(','.join(Row))
     File = open("save_game.txt","w")
     for Row in SaveBoard:
         File.write("".join(Row)+"\n")
+    File.write(Game.GetTurn())
     File.close()
 
 
@@ -595,11 +598,36 @@ def Events():
         if event.type == pygame.QUIT:
             app.exit()
 
+def MenuRender():
+    app.getScreen().fill(WHITE)
+    pg.renderText("Chess",50,BLACK,(app.getWidth()//2)-70,35,app.getScreen())
+    New = pg.renderText("New game",30,BLACK,(app.getWidth()//2)-150,(app.getHeight()//2),app.getScreen())
+    Load = pg.renderText("Load game",30,BLACK,(app.getWidth()//2)+20,(app.getHeight()//2),app.getScreen())
+    pygame.display.update()
+    return New, Load
+
+def Menu():
+    while True:
+        New, Load = MenuRender()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                app.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mx, my = pygame.mouse.get_pos()
+                if New.collidepoint(mx,my):
+                    return "NEW"
+                elif Load.collidepoint(mx,my):
+                    return "LOAD"
+
 def Main():
-    GameOver = False
     app.begin()
+    GameMode = Menu()
     SetBoard()
-    SetPieces('default.txt')
+    if GameMode == "NEW":
+        SetPieces('default.txt')
+    elif GameMode == "LOAD":
+        SetPieces('save_game.txt')
+    GameOver = False
     while not GameOver:
         Render()
         if Game.GetTurn() == "White":
