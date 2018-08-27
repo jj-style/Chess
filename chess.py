@@ -86,15 +86,17 @@ class Pawn(Piece):
         if PlayerTurn == "Black":
             for PotentialMove in BlackClearMoves:
                 try:
-                    if Board[x+PotentialMove[0]][y+PotentialMove[1]].GetContainedPiece() == None:
-                        ValidMoves.append(Board[x+PotentialMove[0]][y+PotentialMove[1]])
+                    if x+PotentialMove[0] >=0 and y+PotentialMove[1] >=0:
+                        if Board[x+PotentialMove[0]][y+PotentialMove[1]].GetContainedPiece() == None:
+                            ValidMoves.append(Board[x+PotentialMove[0]][y+PotentialMove[1]])
                 except:
                     pass
         elif PlayerTurn == "White":
             for PotentialMove in WhiteClearMoves:
                 try:
-                    if Board[x+PotentialMove[0]][y+PotentialMove[1]].GetContainedPiece() == None:
-                        ValidMoves.append(Board[x+PotentialMove[0]][y+PotentialMove[1]])
+                    if x+PotentialMove[0] >=0 and y+PotentialMove[1] >=0:
+                        if Board[x+PotentialMove[0]][y+PotentialMove[1]].GetContainedPiece() == None:
+                            ValidMoves.append(Board[x+PotentialMove[0]][y+PotentialMove[1]])
                 except:
                     pass
 
